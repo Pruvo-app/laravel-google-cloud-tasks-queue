@@ -1,0 +1,46 @@
+{
+    "name": "pruvo/laravel-google-cloud-tasks-queue",
+    "description": "Laravel serverless queue using Google Cloud Tasks with Google Cloud Run.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marick van Tuil",
+            "email": "info@marickvantuil.nl"
+        },
+        {
+            "name": "Ennio Sousa",
+            "email": "ennio@enniosousa.com.br"
+        },
+        {
+            "name": "Pruvo",
+            "email": "dev@pruvo.app"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "google/cloud-tasks": "^v1.9",
+        "firebase/php-jwt": "^5.5",
+        "phpseclib/phpseclib": "~2.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.2",
+        "orchestra/testbench": "^3.5 || ^3.6 || ^3.7 || ^3.8 || ^4.0 || ^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pruvo\\LaravelGoogleCloudTasksQueue\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pruvo\\LaravelGoogleCloudTasksQueue\\CloudTasksServiceProvider"
+            ]
+        }
+    }
+}
