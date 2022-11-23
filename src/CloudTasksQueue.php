@@ -6,6 +6,7 @@ use Google\Cloud\Tasks\V2\CloudTasksClient;
 use Google\Cloud\Tasks\V2\HttpMethod;
 use Google\Cloud\Tasks\V2\HttpRequest;
 use Google\Cloud\Tasks\V2\OidcToken;
+use Google\Cloud\Tasks\V2\Queue;
 use Google\Cloud\Tasks\V2\Task;
 use Google\Protobuf\Timestamp;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -35,7 +36,9 @@ class CloudTasksQueue extends LaravelQueue implements QueueContract
     public function push($job, $data = '', $queue = null)
     {
         return $this->pushToCloudTasks($queue, $this->createPayload(
-            $job, $this->getQueue($queue), $data
+            $job,
+            $this->getQueue($queue),
+            $data
         ));
     }
 
@@ -47,7 +50,9 @@ class CloudTasksQueue extends LaravelQueue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->pushToCloudTasks($queue, $this->createPayload(
-            $job, $this->getQueue($queue), $data
+            $job,
+            $this->getQueue($queue),
+            $data
         ), $delay);
     }
 
@@ -73,7 +78,16 @@ class CloudTasksQueue extends LaravelQueue implements QueueContract
             $task->setScheduleTime(new Timestamp(['seconds' => $availableAt]));
         }
 
-        $this->client->createTask($queueName, $task);
+        try {
+            $this->client->createTask($queueName, $task);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 9) {
+                $formattedParent = $this->client->locationName($this->config['project'], $this->config['location']);
+                $this->client->createQueue($formattedParent, new Queue(['name' => $queueName]));
+                $this->client->createTask($queueName, $task);
+            }
+            throw new \Exception("Could not create task on queue $queueName: " . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     public function pop($queue = null)

@@ -2,7 +2,7 @@
   <img src="/logo.png" width="400">
 </p>
 <p align="center">
-<img src="https://github.com/pruvo-app/laravel-google-cloud-tasks-queue/workflows/Run%20tests/badge.svg?branch=main" alt="Build Status">
+<img src="https://github.com/pruvo/laravel-google-cloud-tasks-queue/workflows/Run%20tests/badge.svg?branch=main" alt="Build Status">
 <a href="https://packagist.org/packages/pruvo/laravel-google-cloud-tasks-queue"><img src="https://poser.pugx.org/pruvo/laravel-google-cloud-tasks-queue/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/pruvo/laravel-google-cloud-tasks-queue"><img src="https://poser.pugx.org/pruvo/laravel-google-cloud-tasks-queue/license.svg" alt="License"></a>
 </p>
@@ -83,6 +83,8 @@ QUEUE_CONNECTION=cloudtasks
 ````bash
 gcloud tasks queues create [QUEUE_ID]
 ````
+
+If the queue doesn't exist, the package will automatically create it for you.
 
 Now that the package is installed, the final step is to set the correct environment variables.
 
