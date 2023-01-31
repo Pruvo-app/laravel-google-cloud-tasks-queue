@@ -93,16 +93,26 @@ class TaskHandler
      */
     protected function validateToken($openIdToken)
     {
-        if (!in_array($openIdToken->iss, ['https://accounts.google.com', 'accounts.google.com'])) {
-            throw new CloudTasksException('The given OpenID token is not valid');
+        if (!in_array($openIdToken->iss, $alloweds = ['https://accounts.google.com', 'accounts.google.com'])) {
+            throw new CloudTasksException(sprintf(
+                "Invalid OpenID token issuer. Expected one of: [%s], got: %s.",
+                implode(', ', $alloweds),
+                $openIdToken->iss
+            ));
         }
 
         if ($openIdToken->aud != $this->config['handler']) {
-            throw new CloudTasksException('The given OpenID token is not valid');
+            throw new CloudTasksException(
+                sprintf(
+                    "Invalid OpenID token audience. Expected: %s, got: %s.",
+                    $this->config['handler'],
+                    $openIdToken->aud
+                )
+            );
         }
 
         if ($openIdToken->exp < time()) {
-            throw new CloudTasksException('The given OpenID token has expired');
+            throw new CloudTasksException('OpenID token has expired');
         }
     }
 
@@ -130,8 +140,10 @@ class TaskHandler
     {
         app('events')->listen(JobFailed::class, function ($event) {
             app('queue.failer')->log(
-                $this->config['connection'], $event->job->getQueue(),
-                $event->job->getRawBody(), $event->exception
+                $this->config['connection'],
+                $event->job->getQueue(),
+                $event->job->getRawBody(),
+                $event->exception
             );
         });
     }
@@ -190,7 +202,7 @@ class TaskHandler
             return null;
         }
 
-        if (! $this->retryConfig->hasMaxRetryDuration()) {
+        if (!$this->retryConfig->hasMaxRetryDuration()) {
             return null;
         }
 
